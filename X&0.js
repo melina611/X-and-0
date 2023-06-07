@@ -10,39 +10,31 @@ function drawLine() {
     ctx.beginPath()
     ctx.moveTo(0, 200)
     ctx.lineTo(600, 200)
-    ctx.stroke()
-
-    ctx.beginPath()
     ctx.moveTo(0, 400)
     ctx.lineTo(600, 400)
-    ctx.stroke()
 
     //vertical lines
 
-    ctx.beginPath()
     ctx.moveTo(200, 0)
     ctx.lineTo(200, 600)
-    ctx.stroke()
-
-    ctx.beginPath()
     ctx.moveTo(400, 0)
     ctx.lineTo(400, 600)
     ctx.stroke()
 
+    for (let i = 0; i < row; ++i) {
+        gameBoard[i] = []
+        for (let j = 0; j < column; ++j) {
+            gameBoard[i][j] = 0
+        }
+    }
     canvas.addEventListener('click', clickOnCanvas)
 }
 
 let curentPlayer = -1
 let winerOfTheGame = 0;
-let borderOfTheGame = []
+let gameBoard = []
 let row = 3
 let column = 3
-for (let i = 0; i < row; ++i) {
-    borderOfTheGame[i] = []
-    for (let j = 0; j < column; ++j) {
-        borderOfTheGame[i][j] = 0
-    }
-}
 
 function clickOnCanvas(event) {
     ++curentPlayer
@@ -53,21 +45,28 @@ function clickOnCanvas(event) {
         y = event.pageY - elemTop
     let x1 = Math.floor(x / 200)
     let y1 = Math.floor(y / 200)
-    if (curentPlayer % 2 == 0 && borderOfTheGame[y1][x1] == 0) {
-        borderOfTheGame[y1][x1] = 1
+    if (curentPlayer % 2 == 0 && gameBoard[y1][x1] == 0) {
+        gameBoard[y1][x1] = 1
         ctx.font = "148px serif"
         ctx.fillText("X", x1 * 200 + 50, y1 * 200 + 150)
-    } else if (curentPlayer % 2 != 0 && borderOfTheGame[y1][x1] == 0) {
-        borderOfTheGame[y1][x1] = 2
+    } else if (curentPlayer % 2 != 0 && gameBoard[y1][x1] == 0) {
+        gameBoard[y1][x1] = 2
         ctx.font = "148px serif"
         ctx.fillText("0", x1 * 200 + 50, y1 * 200 + 150)
     }
-    if (curentPlayer % 2 == 0 && borderOfTheGame[y1][x1] == 2) {
+    if (curentPlayer % 2 == 0 && gameBoard[y1][x1] == 2) {
         --curentPlayer
-    } else if (curentPlayer % 2 != 0 && borderOfTheGame[y1][x1] == 1) {
+    } else if (curentPlayer % 2 != 0 && gameBoard[y1][x1] == 1) {
         --curentPlayer
     }
-    if (borderOfTheGame[y1][0] == borderOfTheGame[y1][1] && borderOfTheGame[y1][1] == borderOfTheGame[y1][2]) {
+    checkColumnAndLine(x1, y1)
+    checkDiagonals()
+    theGameResult(curentPlayer)
+}
+
+function checkColumnAndLine(x1, y1) {
+    ctx = canvas.getContext("2d")
+    if (gameBoard[y1][0] == gameBoard[y1][1] && gameBoard[y1][1] == gameBoard[y1][2]) {
         winerOfTheGame = 1
         ctx.beginPath()
         ctx.moveTo(0, y1 * 200 + 100)
@@ -75,7 +74,7 @@ function clickOnCanvas(event) {
         ctx.stroke()
         canvas.style.pointerEvents = "none"
     }
-    if (borderOfTheGame[0][x1] == borderOfTheGame[1][x1] && borderOfTheGame[1][x1] == borderOfTheGame[2][x1]) {
+    if (gameBoard[0][x1] == gameBoard[1][x1] && gameBoard[1][x1] == gameBoard[2][x1]) {
         winerOfTheGame = 1
         ctx.beginPath()
         ctx.moveTo(x1 * 200 + 100, 0)
@@ -83,7 +82,11 @@ function clickOnCanvas(event) {
         ctx.stroke()
         canvas.style.pointerEvents = "none"
     }
-    if (borderOfTheGame[0][0] == borderOfTheGame[1][1] && borderOfTheGame[1][1] == borderOfTheGame[2][2] && borderOfTheGame[0][0] != 0) {
+}
+
+function checkDiagonals() {
+    ctx = canvas.getContext("2d")
+    if (gameBoard[0][0] == gameBoard[1][1] && gameBoard[1][1] == gameBoard[2][2] && gameBoard[0][0] != 0) {
         winerOfTheGame = 1
         ctx.beginPath()
         ctx.moveTo(0, 0)
@@ -91,7 +94,7 @@ function clickOnCanvas(event) {
         ctx.stroke()
         canvas.style.pointerEvents = "none"
     }
-    if (borderOfTheGame[0][2] == borderOfTheGame[1][1] && borderOfTheGame[1][1] == borderOfTheGame[2][0] && borderOfTheGame[0][2] != 0) {
+    if (gameBoard[0][2] == gameBoard[1][1] && gameBoard[1][1] == gameBoard[2][0] && gameBoard[0][2] != 0) {
         winerOfTheGame = 1
         ctx.beginPath()
         ctx.moveTo(0, 600)
@@ -99,6 +102,9 @@ function clickOnCanvas(event) {
         ctx.stroke()
         canvas.style.pointerEvents = "none"
     }
+}
+
+function theGameResult(curentPlayer) {
     if (curentPlayer % 2 == 0 && winerOfTheGame == 1) {
         let winerPlayer = document.getElementById("winerPlayer")
         winerPlayer.innerHTML = "X WON!"
@@ -114,12 +120,6 @@ function restartTheGame() {
     winerOfTheGame = 0
     canvas.style.pointerEvents = "visible"
     winerPlayer.innerHTML = " "
-    for (let i = 0; i < row; ++i) {
-        borderOfTheGame[i] = []
-        for (let j = 0; j < column; ++j) {
-            borderOfTheGame[i][j] = 0
-        }
-    }
     ctx = canvas.getContext("2d")
     ctx.reset()
     drawLine()
