@@ -45,6 +45,14 @@ function clickOnCanvas(event) {
         y = event.pageY - elemTop
     let x1 = Math.floor(x / 200)
     let y1 = Math.floor(y / 200)
+    theCurentPlayer(curentPlayer, x1, y1)
+    checkColumnAndLine(x1, y1)
+    checkDiagonals()
+    theGameResult(curentPlayer)
+}
+
+function theCurentPlayer(curentPlayer, x1, y1) {
+    ctx = canvas.getContext("2d")
     if (curentPlayer % 2 == 0 && gameBoard[y1][x1] == 0) {
         gameBoard[y1][x1] = 1
         ctx.font = "148px serif"
@@ -59,9 +67,6 @@ function clickOnCanvas(event) {
     } else if (curentPlayer % 2 != 0 && gameBoard[y1][x1] == 1) {
         --curentPlayer
     }
-    checkColumnAndLine(x1, y1)
-    checkDiagonals()
-    theGameResult(curentPlayer)
 }
 
 function checkColumnAndLine(x1, y1) {
